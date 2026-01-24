@@ -58,6 +58,31 @@ npm run dev
 
 L'application sera accessible sur http://localhost:3000
 
+## Note importante : Protection anti-bot YouTube
+
+YouTube détecte et bloque les accès via des outils d'automatisation (Puppeteer, Playwright, Chrome DevTools Protocol, etc.). **Cette application doit être utilisée dans un navigateur normal**, pas via des MCP comme `chrome-devtools` ou `chrome-gui`.
+
+### Pourquoi ?
+
+- YouTube vérifie les signatures du navigateur et bloque les bots
+- La transcription utilise `yt-dlp --cookies-from-browser chrome` pour réutiliser tes cookies d'authentification
+- L'interface web est conçue pour une utilisation manuelle
+
+### Workflow avec Claude Code
+
+```
+Toi (navigateur)              Claude (terminal)
+─────────────────             ──────────────────
+http://localhost:3000
+ → Gérer les chaînes
+ → Sélectionner vidéos
+ → Cliquer "Transcrire"
+                              /veille analyze
+                               → Lit la DB SQLite
+                               → Analyse les transcripts
+                               → Documente les findings
+```
+
 ## Utilisation
 
 1. **Ajouter une chaîne** : Aller sur "Gérer les chaînes" et entrer l'URL ou le handle d'une chaîne YouTube
