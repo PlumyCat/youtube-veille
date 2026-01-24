@@ -81,29 +81,29 @@ export default function ChannelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-900">
+      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-blue-600 hover:text-blue-800">
+            <Link href="/" className="text-blue-400 hover:text-blue-300">
               ← Retour
             </Link>
-            <h1 className="text-xl font-bold text-gray-900">Gérer les chaînes</h1>
+            <h1 className="text-xl font-bold text-gray-100">Gérer les chaînes</h1>
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
           <AddChannelForm onAdd={handleAddChannel} />
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-100">
             Chaînes suivies ({channels.length})
           </h2>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Chargement...</div>
+            <div className="text-center py-8 text-gray-400">Chargement...</div>
           ) : (
             <ChannelList
               channels={channels}

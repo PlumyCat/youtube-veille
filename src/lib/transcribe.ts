@@ -83,7 +83,7 @@ function parseVTT(vtt: string): string {
     // Process cue text
     if (inCue && line.trim()) {
       // Remove VTT formatting tags and HTML entities
-      let cleanLine = line
+      const cleanLine = line
         .replace(/<[^>]+>/g, '')
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')

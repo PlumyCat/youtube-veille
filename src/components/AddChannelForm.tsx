@@ -31,7 +31,7 @@ export default function AddChannelForm({ onAdd }: AddChannelFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label htmlFor="channel-input" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="channel-input" className="block text-sm font-medium text-gray-300 mb-1">
           Ajouter une chaîne
         </label>
         <div className="flex gap-2">
@@ -41,7 +41,7 @@ export default function AddChannelForm({ onAdd }: AddChannelFormProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="URL YouTube, @handle, ou ID de chaîne"
-            className="flex-grow px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="flex-grow px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-gray-100 placeholder-gray-400"
             disabled={loading}
           />
           <button
@@ -55,10 +55,10 @@ export default function AddChannelForm({ onAdd }: AddChannelFormProps) {
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-red-400">{error}</p>
       )}
 
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-gray-400">
         Exemples: https://youtube.com/@Fireship, @ThePrimeagen, UCsBjURrPoezykLs9EqgamOA
       </p>
     </form>
