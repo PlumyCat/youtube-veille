@@ -107,15 +107,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-gray-900">
+      <header className="bg-gray-800 shadow-sm sticky top-0 z-10 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-gray-900">📺 YouTube Veille</h1>
+              <h1 className="text-xl font-bold text-gray-100">📺 YouTube Veille</h1>
               <Link
                 href="/channels"
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-400 hover:text-blue-300"
               >
                 Gérer les chaînes →
               </Link>
@@ -125,7 +125,7 @@ export default function Home() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="px-3 py-1.5 border rounded text-sm"
+                className="px-3 py-1.5 border border-gray-600 rounded text-sm bg-gray-700 text-gray-100"
               >
                 <option value="all">Toutes</option>
                 <option value="new">Nouvelles</option>
@@ -147,14 +147,14 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {selectedIds.size > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between">
-            <span className="text-blue-800">
+          <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-4 mb-6 flex items-center justify-between">
+            <span className="text-blue-200">
               {selectedIds.size} vidéo(s) sélectionnée(s)
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={clearSelection}
-                className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800"
+                className="px-3 py-1.5 text-sm text-blue-400 hover:text-blue-300"
               >
                 Annuler
               </button>
@@ -170,13 +170,13 @@ export default function Home() {
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-gray-500">Chargement...</div>
+          <div className="text-center py-12 text-gray-400">Chargement...</div>
         ) : videos.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">Aucune vidéo</p>
+            <p className="text-gray-400 mb-4">Aucune vidéo</p>
             <Link
               href="/channels"
-              className="text-blue-600 hover:text-blue-800"
+              className="text-blue-400 hover:text-blue-300"
             >
               Ajouter des chaînes pour commencer
             </Link>
@@ -184,10 +184,10 @@ export default function Home() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">{videos.length} vidéo(s)</p>
+              <p className="text-sm text-gray-400">{videos.length} vidéo(s)</p>
               <button
                 onClick={selectAll}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-400 hover:text-blue-300"
               >
                 Sélectionner les nouvelles
               </button>

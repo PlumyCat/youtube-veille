@@ -39,10 +39,10 @@ function formatDate(date: Date): string {
 }
 
 const statusColors: Record<string, string> = {
-  new: 'bg-blue-100 text-blue-800',
-  transcribing: 'bg-yellow-100 text-yellow-800',
-  transcribed: 'bg-green-100 text-green-800',
-  read: 'bg-gray-100 text-gray-600',
+  new: 'bg-blue-900 text-blue-200 border border-blue-700',
+  transcribing: 'bg-yellow-900 text-yellow-200 border border-yellow-700',
+  transcribed: 'bg-green-900 text-green-200 border border-green-700',
+  read: 'bg-gray-700 text-gray-300 border border-gray-600',
 };
 
 const statusLabels: Record<string, string> = {
@@ -65,10 +65,10 @@ export default function VideoCard({
   onSelect,
 }: VideoCardProps) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow ${selected ? 'ring-2 ring-blue-500' : ''}`}>
+    <div className={`bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden hover:shadow-md transition-shadow ${selected ? 'ring-2 ring-blue-500' : ''}`}>
       <div className="relative">
         <Link href={`/video/${id}`}>
-          <div className="relative aspect-video bg-gray-200">
+          <div className="relative aspect-video bg-gray-700">
             {thumbnail ? (
               <Image
                 src={thumbnail}
@@ -101,24 +101,24 @@ export default function VideoCard({
 
       <div className="p-3">
         <Link href={`/video/${id}`}>
-          <h3 className="font-medium text-sm line-clamp-2 hover:text-blue-600 mb-1">
+          <h3 className="font-medium text-sm line-clamp-2 hover:text-blue-400 mb-1 text-gray-100">
             {title}
           </h3>
         </Link>
 
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-gray-400">
           <span className="truncate">{channelName}</span>
           {publishedAt && <span>{formatDate(new Date(publishedAt))}</span>}
         </div>
 
         <div className="flex items-center gap-2 mt-2">
           {status && (
-            <span className={`text-xs px-2 py-0.5 rounded ${statusColors[status] || 'bg-gray-100'}`}>
+            <span className={`text-xs px-2 py-0.5 rounded ${statusColors[status] || 'bg-gray-700'}`}>
               {statusLabels[status] || status}
             </span>
           )}
           {hasTranscript && (
-            <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800">
+            <span className="text-xs px-2 py-0.5 rounded bg-purple-900 text-purple-200 border border-purple-700">
               📝
             </span>
           )}
