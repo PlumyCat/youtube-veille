@@ -22,22 +22,30 @@ export async function transcribeVideoDirect(videoId: string): Promise<Transcript
   await fs.mkdir(tmpDir, { recursive: true });
 
   try {
-    // Try to get auto-generated subtitles
+    // Try to get auto-generated subtitles (with cookies from Chrome to avoid bot detection)
+    // Add deno to PATH for yt-dlp JavaScript runtime
+    const homeDir = os.homedir();
+    const pathWithDeno = `${homeDir}/.deno/bin:${process.env.PATH}`;
+
     await execAsync(
-      `yt-dlp --write-auto-sub --skip-download --sub-format vtt --sub-lang en,fr -o "${outputPath}" "${videoUrl}"`,
-      { maxBuffer: 10 * 1024 * 1024, timeout: 60000 }
+      `yt-dlp --cookies-from-browser chrome --write-auto-sub --skip-download --sub-format vtt --sub-lang fr,en -o "${outputPath}" "${videoUrl}"`,
+      { maxBuffer: 10 * 1024 * 1024, timeout: 120000, env: { ...process.env, PATH: pathWithDeno } }
     );
 
-    // Check for subtitle files
+    // Check for subtitle files - prioritize French
     const files = await fs.readdir(tmpDir);
-    const subFile = files.find(f => f.startsWith(videoId) && f.endsWith('.vtt'));
+    const frSubFile = files.find(f => f.startsWith(videoId) && f.includes('.fr') && f.endsWith('.vtt'));
+    const enSubFile = files.find(f => f.startsWith(videoId) && f.includes('.en') && f.endsWith('.vtt'));
+    const subFile = frSubFile || enSubFile || files.find(f => f.startsWith(videoId) && f.endsWith('.vtt'));
 
     if (subFile) {
       const vttContent = await fs.readFile(path.join(tmpDir, subFile), 'utf-8');
       const content = parseVTT(vttContent);
 
-      // Clean up
-      await fs.unlink(path.join(tmpDir, subFile)).catch(() => {});
+      // Clean up all subtitle files
+      for (const f of files.filter(f => f.startsWith(videoId) && f.endsWith('.vtt'))) {
+        await fs.unlink(path.join(tmpDir, f)).catch(() => {});
+      }
 
       return {
         content,
