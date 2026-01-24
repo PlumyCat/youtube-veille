@@ -23,7 +23,7 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [transcribing, setTranscribing] = useState(false);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>('new');
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -98,8 +98,7 @@ export default function Home() {
   };
 
   const selectAll = () => {
-    const newVideos = videos.filter((v) => v.status === 'new');
-    setSelectedIds(new Set(newVideos.map((v) => v.id)));
+    setSelectedIds(new Set(videos.map((v) => v.id)));
   };
 
   const clearSelection = () => {
@@ -127,8 +126,8 @@ export default function Home() {
                 onChange={(e) => setFilter(e.target.value)}
                 className="px-3 py-1.5 border border-gray-600 rounded text-sm bg-gray-700 text-gray-100"
               >
+                <option value="new">À transcrire</option>
                 <option value="all">Toutes</option>
-                <option value="new">Nouvelles</option>
                 <option value="transcribed">Transcrites</option>
                 <option value="read">Lues</option>
               </select>
@@ -189,7 +188,7 @@ export default function Home() {
                 onClick={selectAll}
                 className="text-sm text-blue-400 hover:text-blue-300"
               >
-                Sélectionner les nouvelles
+                Tout sélectionner
               </button>
             </div>
 
