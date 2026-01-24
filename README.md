@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YouTube Veille
 
-## Getting Started
+Application web pour suivre les vidéos YouTube de chaînes tech/IA, transcrire les vidéos sélectionnées, et générer des résumés pour la veille technologique.
 
-First, run the development server:
+## Fonctionnalités
+
+- **Gestion des chaînes** : Ajouter/supprimer des chaînes YouTube
+- **Liste des vidéos** : Dashboard avec les vidéos récentes, filtres par statut
+- **Transcription** : Extraction automatique des sous-titres YouTube
+- **Lecture** : Affichage de la transcription complète avec actions rapides
+
+## Stack technique
+
+| Composant | Technologie |
+|-----------|-------------|
+| Frontend | Next.js 14 (App Router) |
+| Styling | Tailwind CSS |
+| Database | SQLite (via Drizzle ORM) |
+| YouTube | YouTube Data API v3 |
+| Transcription | yt-dlp (sous-titres YouTube) |
+
+## Installation
+
+### Prérequis
+
+- Node.js 18+
+- npm
+- Une clé API YouTube Data API v3
+
+### Obtenir une clé API YouTube
+
+1. Aller sur [Google Cloud Console](https://console.cloud.google.com/)
+2. Créer un nouveau projet
+3. Activer l'API "YouTube Data API v3"
+4. Créer des identifiants (clé API)
+5. Copier la clé
+
+### Setup
 
 ```bash
+# Cloner le repo
+git clone https://github.com/PlumyCat/youtube-veille.git
+cd youtube-veille
+
+# Installer les dépendances
+npm install
+
+# Configurer l'environnement
+cp .env.example .env.local
+# Éditer .env.local et ajouter votre YOUTUBE_API_KEY
+
+# Initialiser la base de données
+npm run db:push
+
+# Lancer en développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'application sera accessible sur http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Utilisation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Ajouter une chaîne** : Aller sur "Gérer les chaînes" et entrer l'URL ou le handle d'une chaîne YouTube
+2. **Voir les vidéos** : Les 10 dernières vidéos de chaque chaîne sont automatiquement récupérées
+3. **Transcrire** : Sélectionner une ou plusieurs vidéos et cliquer sur "Transcrire la sélection"
+4. **Lire** : Cliquer sur une vidéo pour voir sa transcription complète
 
-## Learn More
+## Scripts disponibles
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev          # Lancer en mode développement
+npm run build        # Build pour production
+npm run start        # Lancer en production
+npm run db:push      # Appliquer le schéma à la DB
+npm run db:studio    # Ouvrir Drizzle Studio (GUI DB)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure du projet
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+youtube-veille/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Dashboard vidéos
+│   │   ├── channels/page.tsx     # Gestion chaînes
+│   │   ├── video/[id]/page.tsx   # Détail vidéo
+│   │   └── api/                  # Routes API
+│   ├── components/               # Composants React
+│   ├── lib/                      # Utilitaires (DB, YouTube, etc.)
+│   └── db/                       # Schéma Drizzle
+├── data/                         # Base SQLite (créé automatiquement)
+├── drizzle.config.ts
+└── .env.local                    # Configuration (non versionné)
+```
 
-## Deploy on Vercel
+## Roadmap (v2)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] Résumé automatique via Claude API
+- [ ] Tags/catégories pour les vidéos
+- [ ] Export markdown pour veille.md
+- [ ] Notifications de nouvelles vidéos
+- [ ] Support Whisper pour vidéos sans sous-titres
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT
