@@ -1,6 +1,28 @@
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_API_BASE = 'https://www.googleapis.com/youtube/v3';
 
+// Validation patterns
+const VALID_CHANNEL_ID = /^UC[a-zA-Z0-9_-]{22}$/;
+const VALID_HANDLE = /^@?[a-zA-Z0-9_.-]{3,30}$/;
+const VALID_VIDEO_ID = /^[a-zA-Z0-9_-]{11}$/;
+
+/**
+ * Validate channel ID format
+ */
+function validateChannelId(channelId: string): void {
+  if (!channelId || !VALID_CHANNEL_ID.test(channelId)) {
+    throw new Error('Invalid channel ID format');
+  }
+}
+
+/**
+ * Sanitize user input for API calls
+ */
+function sanitizeInput(input: string): string {
+  // Remove any potential injection characters
+  return input.replace(/[<>'";&|`$(){}[\]\\]/g, '').trim();
+}
+
 export interface YouTubeChannel {
   id: string;
   name: string;
@@ -84,6 +106,9 @@ export async function getChannelDetails(channelId: string): Promise<YouTubeChann
     throw new Error('YOUTUBE_API_KEY not configured');
   }
 
+  // Validate channel ID format
+  validateChannelId(channelId);
+
   const res = await fetch(
     `${YOUTUBE_API_BASE}/channels?part=snippet&id=${channelId}&key=${YOUTUBE_API_KEY}`
   );
@@ -118,6 +143,12 @@ export async function getChannelVideos(
 ): Promise<YouTubeVideo[]> {
   if (!YOUTUBE_API_KEY) {
     throw new Error('YOUTUBE_API_KEY not configured');
+  }
+
+  // Validate inputs
+  validateChannelId(channelId);
+  if (maxResults < 1 || maxResults > 50) {
+    throw new Error('maxResults must be between 1 and 50');
   }
 
   // First, get the uploads playlist ID
@@ -179,8 +210,14 @@ export async function searchChannels(query: string): Promise<YouTubeChannel[]> {
     throw new Error('YOUTUBE_API_KEY not configured');
   }
 
+  // Sanitize and validate query
+  const sanitizedQuery = sanitizeInput(query);
+  if (!sanitizedQuery || sanitizedQuery.length < 2 || sanitizedQuery.length > 100) {
+    throw new Error('Query must be between 2 and 100 characters');
+  }
+
   const res = await fetch(
-    `${YOUTUBE_API_BASE}/search?part=snippet&type=channel&q=${encodeURIComponent(query)}&maxResults=5&key=${YOUTUBE_API_KEY}`
+    `${YOUTUBE_API_BASE}/search?part=snippet&type=channel&q=${encodeURIComponent(sanitizedQuery)}&maxResults=5&key=${YOUTUBE_API_KEY}`
   );
   const data = await res.json();
 
