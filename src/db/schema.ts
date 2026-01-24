@@ -26,6 +26,18 @@ export const transcripts = sqliteTable('transcripts', {
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
+// Veille items - track discovered features/updates
+export const veilleItems = sqliteTable('veille_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  videoId: text('video_id').references(() => videos.id), // Source video (optional)
+  title: text('title').notNull(), // Feature name
+  description: text('description'), // Details
+  source: text('source'), // "youtube", "changelog", "manual"
+  status: text('status').$type<'discovered' | 'testing' | 'applied' | 'rejected'>().default('discovered'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  appliedAt: integer('applied_at', { mode: 'timestamp' }),
+});
+
 // Types for TypeScript
 export type Channel = typeof channels.$inferSelect;
 export type NewChannel = typeof channels.$inferInsert;
@@ -33,3 +45,5 @@ export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
 export type Transcript = typeof transcripts.$inferSelect;
 export type NewTranscript = typeof transcripts.$inferInsert;
+export type VeilleItem = typeof veilleItems.$inferSelect;
+export type NewVeilleItem = typeof veilleItems.$inferInsert;
