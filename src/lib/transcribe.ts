@@ -41,24 +41,32 @@ export async function transcribeVideoDirect(videoId: string): Promise<Transcript
   await fs.mkdir(tmpDir, { recursive: true, mode: 0o700 });
 
   try {
-    // Add deno to PATH for yt-dlp JavaScript runtime
+    // Add local bin paths to PATH for yt-dlp
     const homeDir = os.homedir();
-    const pathWithDeno = `${homeDir}/.deno/bin:${process.env.PATH}`;
+    const extendedPath = `${homeDir}/.local/bin:${homeDir}/.deno/bin:${process.env.PATH}`;
 
     // Use execFile with array arguments (secure - no shell interpolation)
-    await execFileAsync('yt-dlp', [
-      '--cookies-from-browser', 'chrome',
-      '--write-auto-sub',
-      '--skip-download',
-      '--sub-format', 'vtt',
-      '--sub-lang', 'fr,en',
-      '-o', outputPath,
-      videoUrl
-    ], {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 120000,
-      env: { ...process.env, PATH: pathWithDeno }
-    });
+    // yt-dlp may return non-zero even if some subtitles were downloaded
+    // (e.g., FR succeeds but EN fails with 429), so we catch and continue
+    try {
+      await execFileAsync('yt-dlp', [
+        '--no-warnings',
+        '--cookies-from-browser', 'chrome',
+        '--write-auto-sub',
+        '--skip-download',
+        '--sub-format', 'vtt',
+        '--sub-lang', 'fr,en',
+        '-o', outputPath,
+        videoUrl
+      ], {
+        maxBuffer: 10 * 1024 * 1024,
+        timeout: 120000,
+        env: { ...process.env, PATH: extendedPath }
+      });
+    } catch (ytdlpError) {
+      // Log warning but continue - subtitles might still have been downloaded
+      console.warn('yt-dlp warning:', ytdlpError instanceof Error ? ytdlpError.message : ytdlpError);
+    }
 
     // Check for subtitle files - prioritize French
     const files = await fs.readdir(tmpDir);
