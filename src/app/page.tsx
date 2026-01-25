@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import VideoCard from '@/components/VideoCard';
+import ChannelGroup from '@/components/ChannelGroup';
 
 interface Video {
   id: string;
@@ -24,6 +25,7 @@ export default function Home() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [transcribing, setTranscribing] = useState(false);
   const [filter, setFilter] = useState<string>('new');
+  const [viewMode, setViewMode] = useState<'date' | 'channel'>('date');
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -44,6 +46,51 @@ export default function Home() {
   useEffect(() => {
     fetchVideos();
   }, [fetchVideos]);
+
+  // Load view mode from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('videoViewMode');
+    if (saved === 'date' || saved === 'channel') {
+      setViewMode(saved);
+    }
+  }, []);
+
+  // Save view mode to localStorage
+  const handleViewModeChange = (mode: 'date' | 'channel') => {
+    setViewMode(mode);
+    localStorage.setItem('videoViewMode', mode);
+  };
+
+  // Group videos by channel, sorted by most recent video
+  const groupedVideos = useMemo(() => {
+    const groups: Record<string, Video[]> = {};
+
+    for (const video of videos) {
+      const channelName = video.channelName || 'Chaîne inconnue';
+      if (!groups[channelName]) {
+        groups[channelName] = [];
+      }
+      groups[channelName].push(video);
+    }
+
+    // Sort videos within each group by date (recent first)
+    for (const channelName of Object.keys(groups)) {
+      groups[channelName].sort((a, b) => {
+        const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+        const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+        return dateB - dateA;
+      });
+    }
+
+    // Sort groups by most recent video date
+    const sortedEntries = Object.entries(groups).sort(([, videosA], [, videosB]) => {
+      const latestA = videosA[0]?.publishedAt ? new Date(videosA[0].publishedAt).getTime() : 0;
+      const latestB = videosB[0]?.publishedAt ? new Date(videosB[0].publishedAt).getTime() : 0;
+      return latestB - latestA;
+    });
+
+    return sortedEntries;
+  }, [videos]);
 
   const handleRefreshAll = async () => {
     setRefreshing(true);
@@ -121,6 +168,29 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="flex rounded-lg border border-gray-600 overflow-hidden">
+                <button
+                  onClick={() => handleViewModeChange('date')}
+                  className={`px-3 py-1.5 text-sm transition-colors ${
+                    viewMode === 'date'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Par date
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('channel')}
+                  className={`px-3 py-1.5 text-sm transition-colors ${
+                    viewMode === 'channel'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Par chaîne
+                </button>
+              </div>
+
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -192,23 +262,38 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {videos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  id={video.id}
-                  title={video.title}
-                  thumbnail={video.thumbnail || ''}
-                  channelName={video.channelName}
-                  publishedAt={video.publishedAt}
-                  duration={video.duration}
-                  status={video.status}
-                  hasTranscript={video.hasTranscript}
-                  selected={selectedIds.has(video.id)}
-                  onSelect={handleSelect}
-                />
-              ))}
-            </div>
+            {viewMode === 'date' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {videos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    thumbnail={video.thumbnail || ''}
+                    channelName={video.channelName}
+                    publishedAt={video.publishedAt}
+                    duration={video.duration}
+                    status={video.status}
+                    hasTranscript={video.hasTranscript}
+                    selected={selectedIds.has(video.id)}
+                    onSelect={handleSelect}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div>
+                {groupedVideos.map(([channelName, channelVideos]) => (
+                  <ChannelGroup
+                    key={channelName}
+                    channelName={channelName}
+                    videos={channelVideos}
+                    selectedIds={selectedIds}
+                    onSelect={handleSelect}
+                    defaultOpen={true}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
       </main>
