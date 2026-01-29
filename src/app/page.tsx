@@ -253,7 +253,9 @@ export default function Home() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-400">{videos.length} vidéo(s)</p>
+              <p className="text-sm text-gray-400">
+                {videos.length} vidéo(s)
+              </p>
               <button
                 onClick={selectAll}
                 className="text-sm text-blue-400 hover:text-blue-300"
