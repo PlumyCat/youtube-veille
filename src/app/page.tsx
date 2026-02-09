@@ -218,10 +218,10 @@ export default function Home() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        {selectedIds.size > 0 && (
-          <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-4 mb-6 flex items-center justify-between">
-            <span className="text-blue-200">
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-800/95 backdrop-blur border-t border-blue-700 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <span className="text-blue-200 text-sm">
               {selectedIds.size} vidéo(s) sélectionnée(s)
             </span>
             <div className="flex items-center gap-2">
@@ -240,8 +240,10 @@ export default function Home() {
               </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
+      <main className="max-w-7xl mx-auto px-4 py-6">
         {loading ? (
           <div className="text-center py-12 text-gray-400">Chargement...</div>
         ) : videos.length === 0 ? (
