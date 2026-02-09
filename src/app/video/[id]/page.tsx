@@ -44,17 +44,16 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
 
   const fetchData = useCallback(async () => {
     try {
-      // Fetch video details
-      const videosRes = await fetch(`/api/videos?limit=1000`);
-      const videos = await videosRes.json();
-      const foundVideo = videos.find((v: Video) => v.id === id);
+      const [videoRes, transcriptRes] = await Promise.all([
+        fetch(`/api/videos/${id}`),
+        fetch(`/api/transcribe?videoId=${id}`),
+      ]);
 
-      if (foundVideo) {
-        setVideo(foundVideo);
+      if (videoRes.ok) {
+        const videoData = await videoRes.json();
+        setVideo(videoData);
       }
 
-      // Fetch transcript
-      const transcriptRes = await fetch(`/api/transcribe?videoId=${id}`);
       if (transcriptRes.ok) {
         const transcriptData = await transcriptRes.json();
         setTranscript(transcriptData);
@@ -111,17 +110,17 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-400">Chargement...</div>
       </div>
     );
   }
 
   if (!video) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <div className="text-gray-500">Vidéo non trouvée</div>
-        <Link href="/" className="text-blue-600 hover:text-blue-800">
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center gap-4">
+        <div className="text-gray-400">Vidéo non trouvée</div>
+        <Link href="/" className="text-blue-400 hover:text-blue-300">
           ← Retour au dashboard
         </Link>
       </div>
@@ -129,10 +128,10 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-900">
+      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
         <div className="max-w-5xl mx-auto px-4 py-4">
-          <Link href="/" className="text-blue-600 hover:text-blue-800">
+          <Link href="/" className="text-blue-400 hover:text-blue-300">
             ← Retour
           </Link>
         </div>
@@ -140,7 +139,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {/* Video info */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden">
           <div className="md:flex">
             <div className="md:w-1/3 relative aspect-video md:aspect-auto">
               {video.thumbnail ? (
@@ -151,16 +150,16 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                  No thumbnail
+                <div className="w-full h-full bg-gray-700 flex items-center justify-center text-gray-400">
+                  Pas de miniature
                 </div>
               )}
             </div>
             <div className="p-6 md:w-2/3">
-              <h1 className="text-xl font-bold mb-2">{video.title}</h1>
-              <p className="text-gray-600 mb-4">{video.channelName}</p>
+              <h1 className="text-xl font-bold mb-2 text-gray-100">{video.title}</h1>
+              <p className="text-gray-400 mb-4">{video.channelName}</p>
 
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+              <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
                 {video.publishedAt && (
                   <span>
                     📅 {new Date(video.publishedAt).toLocaleDateString('fr-FR')}
@@ -193,7 +192,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
               </div>
 
               {error && (
-                <p className="mt-4 text-red-600 text-sm">{error}</p>
+                <p className="mt-4 text-red-400 text-sm">{error}</p>
               )}
             </div>
           </div>
@@ -207,7 +206,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
             videoId={video.id}
           />
         ) : (
-          <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-gray-500">
+          <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-8 text-center text-gray-400">
             <p className="mb-4">Pas encore de transcription pour cette vidéo</p>
             <button
               onClick={handleTranscribe}

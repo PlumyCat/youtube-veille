@@ -19,14 +19,14 @@ export default function TranscriptViewer({ content, source, videoId }: Transcrip
 
   const sourceLabel = source === 'gemini' ? 'Gemini AI' : 'YouTube Captions';
   const sourceBadgeClass = source === 'gemini'
-    ? 'bg-blue-100 text-blue-700'
-    : 'bg-gray-200 text-gray-600';
+    ? 'bg-blue-900 text-blue-200 border border-blue-700'
+    : 'bg-gray-700 text-gray-300 border border-gray-600';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border">
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
+    <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium">Transcription</h3>
+          <h3 className="font-medium text-gray-100">Transcription</h3>
           <span className={`text-xs px-2 py-0.5 rounded ${sourceBadgeClass}`}>
             {sourceLabel}
           </span>
@@ -34,7 +34,7 @@ export default function TranscriptViewer({ content, source, videoId }: Transcrip
         <div className="flex items-center gap-2">
           <button
             onClick={copyToClipboard}
-            className="px-3 py-1.5 text-sm bg-gray-100 rounded hover:bg-gray-200"
+            className="px-3 py-1.5 text-sm bg-gray-700 text-gray-200 rounded hover:bg-gray-600"
           >
             {copied ? '✓ Copié' : '📋 Copier'}
           </button>
@@ -42,7 +42,7 @@ export default function TranscriptViewer({ content, source, videoId }: Transcrip
             href={`https://www.youtube.com/watch?v=${videoId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+            className="px-3 py-1.5 text-sm bg-red-900 text-red-200 rounded hover:bg-red-800"
           >
             ▶ YouTube
           </a>
@@ -50,12 +50,12 @@ export default function TranscriptViewer({ content, source, videoId }: Transcrip
       </div>
 
       <div className="p-4 max-h-[600px] overflow-y-auto">
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-300">
           {content}
         </p>
       </div>
 
-      <div className="px-4 py-2 border-t bg-gray-50 text-xs text-gray-500">
+      <div className="px-4 py-2 border-t border-gray-700 bg-gray-800 text-xs text-gray-500">
         {content.split(' ').length} mots • {content.length} caractères
       </div>
     </div>

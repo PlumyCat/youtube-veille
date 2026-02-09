@@ -24,7 +24,8 @@ export default function Home() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [transcribing, setTranscribing] = useState(false);
   const [filter, setFilter] = useState<string>('new');
-  const viewMode = 'channel' as const;
+  const [search, setSearch] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -47,11 +48,20 @@ export default function Home() {
   }, [fetchVideos]);
 
 
-  // Group videos by channel, sorted by most recent video
+  // Filter videos by search query, then group by channel
   const groupedVideos = useMemo(() => {
+    const searchLower = search.toLowerCase();
+    const filtered = search
+      ? videos.filter(
+          (v) =>
+            v.title.toLowerCase().includes(searchLower) ||
+            (v.channelName || '').toLowerCase().includes(searchLower)
+        )
+      : videos;
+
     const groups: Record<string, Video[]> = {};
 
-    for (const video of videos) {
+    for (const video of filtered) {
       const channelName = video.channelName || 'Chaîne inconnue';
       if (!groups[channelName]) {
         groups[channelName] = [];
@@ -76,20 +86,30 @@ export default function Home() {
     });
 
     return sortedEntries;
-  }, [videos]);
+  }, [videos, search]);
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  };
 
   const handleRefreshAll = async () => {
     setRefreshing(true);
     try {
       const res = await fetch('/api/videos/fetch', { method: 'POST', body: JSON.stringify({}) });
       const data = await res.json();
-      if (data.newVideos > 0) {
+      if (data.newVideos > 0 || data.markedUnavailable > 0) {
         await fetchVideos();
       }
-      alert(`${data.newVideos} nouvelle(s) vidéo(s) ajoutée(s)`);
+      const parts: string[] = [];
+      parts.push(`${data.newVideos} nouvelle(s) vidéo(s)`);
+      if (data.markedUnavailable > 0) {
+        parts.push(`${data.markedUnavailable} supprimée(s)`);
+      }
+      showToast(parts.join(' • '));
     } catch (error) {
       console.error('Error refreshing:', error);
-      alert('Erreur lors du rafraîchissement');
+      showToast('Erreur lors du rafraîchissement', 'error');
     } finally {
       setRefreshing(false);
     }
@@ -154,6 +174,14 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher..."
+                className="px-3 py-1.5 border border-gray-600 rounded text-sm bg-gray-700 text-gray-100 placeholder-gray-400 w-48"
+              />
+
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -176,6 +204,19 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {toast && (
+        <div className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm transition-all ${
+          toast.type === 'error'
+            ? 'bg-red-900 text-red-200 border border-red-700'
+            : 'bg-green-900 text-green-200 border border-green-700'
+        }`}>
+          <div className="flex items-center gap-2">
+            <span>{toast.type === 'error' ? '⚠️' : '✓'} {toast.message}</span>
+            <button onClick={() => setToast(null)} className="ml-2 opacity-60 hover:opacity-100">✕</button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {selectedIds.size > 0 && (
