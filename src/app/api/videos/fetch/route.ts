@@ -31,12 +31,24 @@ export async function POST(request: NextRequest) {
     let totalNew = 0;
     const errors: string[] = [];
 
-    for (const channel of channels) {
-      try {
+    // Fetch videos from all channels in parallel
+    const results = await Promise.allSettled(
+      channels.map(async (channel) => {
         const videos = await getChannelVideos(channel.id, 10);
+        return { channel, videos };
+      })
+    );
 
+    // Insert new videos sequentially (SQLite doesn't handle concurrent writes well)
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        errors.push(result.reason instanceof Error ? result.reason.message : 'Unknown error');
+        continue;
+      }
+
+      const { channel, videos } = result.value;
+      try {
         for (const video of videos) {
-          // Check if video already exists
           const existing = await db
             .select()
             .from(schema.videos)

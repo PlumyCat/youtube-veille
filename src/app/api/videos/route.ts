@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, inArray, isNotNull } from 'drizzle-orm';
 
 // GET /api/videos - List all videos with optional filters
 export async function GET(request: NextRequest) {
@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
       query = query.where(eq(schema.videos.channelId, channelId));
     }
 
-    if (status) {
+    if (status === 'transcribed') {
+      // "Transcrites" = all videos that have a transcript (transcribed + read)
+      query = query.where(isNotNull(schema.transcripts.videoId));
+    } else if (status) {
       query = query.where(eq(schema.videos.status, status as 'new' | 'transcribing' | 'transcribed' | 'read'));
     }
 

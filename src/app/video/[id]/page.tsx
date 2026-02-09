@@ -51,15 +51,6 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
 
       if (foundVideo) {
         setVideo(foundVideo);
-
-        // Mark as read if transcribed
-        if (foundVideo.status === 'transcribed') {
-          await fetch('/api/videos', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, status: 'read' }),
-          });
-        }
       }
 
       // Fetch transcript
@@ -74,6 +65,19 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
       setLoading(false);
     }
   }, [id]);
+
+  // Mark as read on first load if video is transcribed
+  useEffect(() => {
+    if (video && video.status === 'transcribed' && transcript) {
+      fetch('/api/videos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: 'read' }),
+      });
+      setVideo((prev) => prev ? { ...prev, status: 'read' } : prev);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   useEffect(() => {
     fetchData();
@@ -97,7 +101,7 @@ export default function VideoPage({ params }: { params: Promise<{ id: string }> 
 
       const data = await res.json();
       setTranscript(data.transcript);
-      await fetchData(); // Refresh video status
+      setVideo((prev) => prev ? { ...prev, status: 'transcribed' } : prev);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Transcription failed');
     } finally {
