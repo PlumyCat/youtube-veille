@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { transcribeVideoDirect } from '@/lib/transcribe';
+import { transcribeVideo } from '@/lib/transcribe';
 
 // POST /api/transcribe - Transcribe a video
 export async function POST(request: NextRequest) {
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Transcribe the video
-      const result = await transcribeVideoDirect(videoId);
+      const result = await transcribeVideo(videoId);
 
       // Save transcript
       const transcript = await db

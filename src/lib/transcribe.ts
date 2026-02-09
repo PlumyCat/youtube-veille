@@ -11,7 +11,7 @@ const VALID_VIDEO_ID = /^[a-zA-Z0-9_-]{11}$/;
 
 export interface TranscriptResult {
   content: string;
-  source: 'youtube_captions' | 'whisper_ai';
+  source: 'youtube_captions' | 'gemini';
   segmentsCount: number;
 }
 
@@ -158,5 +158,15 @@ function parseVTT(vtt: string): string {
     .trim();
 }
 
-// Alias for backwards compatibility
-export const transcribeVideo = transcribeVideoDirect;
+// Try yt-dlp first, fallback to Gemini if it fails
+export async function transcribeVideo(videoId: string): Promise<TranscriptResult> {
+  try {
+    return await transcribeVideoDirect(videoId);
+  } catch (ytdlpError) {
+    console.log(`yt-dlp failed for ${videoId}: ${ytdlpError instanceof Error ? ytdlpError.message : 'Unknown error'}`);
+    console.log('Falling back to Gemini...');
+
+    const { transcribeWithGemini } = await import('./gemini');
+    return await transcribeWithGemini(videoId);
+  }
+}

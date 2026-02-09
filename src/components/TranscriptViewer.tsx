@@ -17,14 +17,17 @@ export default function TranscriptViewer({ content, source, videoId }: Transcrip
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const sourceLabel = source === 'whisper_ai' ? 'Whisper AI' : 'YouTube Captions';
+  const sourceLabel = source === 'gemini' ? 'Gemini AI' : 'YouTube Captions';
+  const sourceBadgeClass = source === 'gemini'
+    ? 'bg-blue-100 text-blue-700'
+    : 'bg-gray-200 text-gray-600';
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
         <div className="flex items-center gap-2">
           <h3 className="font-medium">Transcription</h3>
-          <span className="text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-600">
+          <span className={`text-xs px-2 py-0.5 rounded ${sourceBadgeClass}`}>
             {sourceLabel}
           </span>
         </div>
