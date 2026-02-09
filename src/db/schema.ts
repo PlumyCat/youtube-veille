@@ -14,7 +14,7 @@ export const videos = sqliteTable('videos', {
   thumbnail: text('thumbnail'),
   publishedAt: integer('published_at', { mode: 'timestamp' }),
   duration: integer('duration'), // seconds
-  status: text('status').$type<'new' | 'transcribing' | 'transcribed' | 'read'>().default('new'),
+  status: text('status').$type<'new' | 'transcribing' | 'transcribed' | 'read' | 'unavailable'>().default('new'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 

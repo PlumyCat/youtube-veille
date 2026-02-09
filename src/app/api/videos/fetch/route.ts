@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { getChannelVideos } from '@/lib/youtube';
+import { eq, ne } from 'drizzle-orm';
+import { getChannelVideos, checkVideosExist } from '@/lib/youtube';
 
 // POST /api/videos/fetch - Fetch new videos from channels
 export async function POST(request: NextRequest) {
@@ -76,9 +76,38 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Check for unavailable videos among non-unavailable ones
+    let markedUnavailable = 0;
+    try {
+      const allVideos = await db
+        .select({ id: schema.videos.id })
+        .from(schema.videos)
+        .where(ne(schema.videos.status, 'unavailable'))
+        .all();
+
+      if (allVideos.length > 0) {
+        const allIds = allVideos.map((v) => v.id);
+        const existingIds = await checkVideosExist(allIds);
+
+        for (const video of allVideos) {
+          if (!existingIds.has(video.id)) {
+            await db
+              .update(schema.videos)
+              .set({ status: 'unavailable' })
+              .where(eq(schema.videos.id, video.id))
+              .run();
+            markedUnavailable++;
+          }
+        }
+      }
+    } catch (error) {
+      errors.push(`Availability check: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
     return NextResponse.json({
       success: true,
       newVideos: totalNew,
+      markedUnavailable,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {

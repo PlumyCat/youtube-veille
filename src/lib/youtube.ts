@@ -204,6 +204,35 @@ export async function getChannelVideos(
   }));
 }
 
+// Check which video IDs still exist on YouTube (batch, max 50 per call)
+export async function checkVideosExist(videoIds: string[]): Promise<Set<string>> {
+  if (!YOUTUBE_API_KEY) {
+    throw new Error('YOUTUBE_API_KEY not configured');
+  }
+
+  const existingIds = new Set<string>();
+
+  // YouTube API accepts max 50 IDs per request
+  for (let i = 0; i < videoIds.length; i += 50) {
+    const batch = videoIds.slice(i, i + 50);
+    for (const id of batch) {
+      if (!VALID_VIDEO_ID.test(id)) {
+        throw new Error(`Invalid video ID format: ${id}`);
+      }
+    }
+    const ids = batch.join(',');
+    const res = await fetch(
+      `${YOUTUBE_API_BASE}/videos?part=id&id=${ids}&key=${YOUTUBE_API_KEY}`
+    );
+    const data = await res.json();
+    for (const item of data.items || []) {
+      existingIds.add(item.id);
+    }
+  }
+
+  return existingIds;
+}
+
 // Search for channel by name
 export async function searchChannels(query: string): Promise<YouTubeChannel[]> {
   if (!YOUTUBE_API_KEY) {

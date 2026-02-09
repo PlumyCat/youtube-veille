@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
-import { eq, desc, inArray, isNotNull } from 'drizzle-orm';
+import { eq, desc, and, isNotNull, ne, type SQL } from 'drizzle-orm';
 
 // GET /api/videos - List all videos with optional filters
 export async function GET(request: NextRequest) {
@@ -10,7 +10,20 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    let query = db
+    // Build filter conditions
+    const conditions: SQL[] = [ne(schema.videos.status, 'unavailable')];
+
+    if (channelId) {
+      conditions.push(eq(schema.videos.channelId, channelId));
+    }
+
+    if (status === 'transcribed') {
+      conditions.push(isNotNull(schema.transcripts.videoId));
+    } else if (status) {
+      conditions.push(eq(schema.videos.status, status as 'new' | 'transcribing' | 'transcribed' | 'read'));
+    }
+
+    const query = db
       .select({
         video: schema.videos,
         channel: schema.channels,
@@ -19,20 +32,9 @@ export async function GET(request: NextRequest) {
       .from(schema.videos)
       .leftJoin(schema.channels, eq(schema.videos.channelId, schema.channels.id))
       .leftJoin(schema.transcripts, eq(schema.videos.id, schema.transcripts.videoId))
+      .where(and(...conditions))
       .orderBy(desc(schema.videos.publishedAt))
-      .limit(limit)
-      .$dynamic();
-
-    if (channelId) {
-      query = query.where(eq(schema.videos.channelId, channelId));
-    }
-
-    if (status === 'transcribed') {
-      // "Transcrites" = all videos that have a transcript (transcribed + read)
-      query = query.where(isNotNull(schema.transcripts.videoId));
-    } else if (status) {
-      query = query.where(eq(schema.videos.status, status as 'new' | 'transcribing' | 'transcribed' | 'read'));
-    }
+      .limit(limit);
 
     const results = await query.all();
 

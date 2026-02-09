@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import VideoCard from '@/components/VideoCard';
 import ChannelGroup from '@/components/ChannelGroup';
 
 interface Video {
@@ -25,7 +24,7 @@ export default function Home() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [transcribing, setTranscribing] = useState(false);
   const [filter, setFilter] = useState<string>('new');
-  const [viewMode, setViewMode] = useState<'date' | 'channel'>('date');
+  const viewMode = 'channel' as const;
 
   const fetchVideos = useCallback(async () => {
     try {
@@ -47,19 +46,6 @@ export default function Home() {
     fetchVideos();
   }, [fetchVideos]);
 
-  // Load view mode from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('videoViewMode');
-    if (saved === 'date' || saved === 'channel') {
-      setViewMode(saved);
-    }
-  }, []);
-
-  // Save view mode to localStorage
-  const handleViewModeChange = (mode: 'date' | 'channel') => {
-    setViewMode(mode);
-    localStorage.setItem('videoViewMode', mode);
-  };
 
   // Group videos by channel, sorted by most recent video
   const groupedVideos = useMemo(() => {
@@ -168,29 +154,6 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex rounded-lg border border-gray-600 overflow-hidden">
-                <button
-                  onClick={() => handleViewModeChange('date')}
-                  className={`px-3 py-1.5 text-sm transition-colors ${
-                    viewMode === 'date'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  Par date
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('channel')}
-                  className={`px-3 py-1.5 text-sm transition-colors ${
-                    viewMode === 'channel'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  Par chaîne
-                </button>
-              </div>
-
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -264,38 +227,18 @@ export default function Home() {
               </button>
             </div>
 
-            {viewMode === 'date' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {videos.map((video) => (
-                  <VideoCard
-                    key={video.id}
-                    id={video.id}
-                    title={video.title}
-                    thumbnail={video.thumbnail || ''}
-                    channelName={video.channelName}
-                    publishedAt={video.publishedAt}
-                    duration={video.duration}
-                    status={video.status}
-                    hasTranscript={video.hasTranscript}
-                    selected={selectedIds.has(video.id)}
-                    onSelect={handleSelect}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div>
-                {groupedVideos.map(([channelName, channelVideos]) => (
-                  <ChannelGroup
-                    key={channelName}
-                    channelName={channelName}
-                    videos={channelVideos}
-                    selectedIds={selectedIds}
-                    onSelect={handleSelect}
-                    defaultOpen={true}
-                  />
-                ))}
-              </div>
-            )}
+            <div>
+              {groupedVideos.map(([channelName, channelVideos]) => (
+                <ChannelGroup
+                  key={channelName}
+                  channelName={channelName}
+                  videos={channelVideos}
+                  selectedIds={selectedIds}
+                  onSelect={handleSelect}
+                  defaultOpen={true}
+                />
+              ))}
+            </div>
           </>
         )}
       </main>
