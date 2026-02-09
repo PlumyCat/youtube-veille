@@ -6,7 +6,7 @@ Application web pour suivre les vidéos YouTube de chaînes tech/IA, transcrire 
 
 - **Gestion des chaînes** : Ajouter/supprimer des chaînes YouTube
 - **Liste des vidéos** : Dashboard avec les vidéos récentes, filtres par statut
-- **Transcription** : Extraction automatique des sous-titres YouTube
+- **Transcription** : Extraction des sous-titres YouTube, fallback Gemini AI si indisponibles
 - **Lecture** : Affichage de la transcription complète avec actions rapides
 
 ## Stack technique
@@ -17,7 +17,7 @@ Application web pour suivre les vidéos YouTube de chaînes tech/IA, transcrire 
 | Styling | Tailwind CSS |
 | Database | SQLite (via Drizzle ORM) |
 | YouTube | YouTube Data API v3 |
-| Transcription | yt-dlp (sous-titres YouTube) |
+| Transcription | yt-dlp (sous-titres YouTube) + Gemini 2.0 Flash (fallback) |
 
 ## Installation
 
@@ -25,13 +25,13 @@ Application web pour suivre les vidéos YouTube de chaînes tech/IA, transcrire 
 
 - Node.js 18+
 - npm
-- Une clé API YouTube Data API v3
+- Une clé API Google (YouTube Data API v3 + Gemini API)
 
 ### Obtenir une clé API YouTube
 
 1. Aller sur [Google Cloud Console](https://console.cloud.google.com/)
 2. Créer un nouveau projet
-3. Activer l'API "YouTube Data API v3"
+3. Activer les APIs "YouTube Data API v3" et "Generative Language API" (Gemini)
 4. Créer des identifiants (clé API)
 5. Copier la clé
 
@@ -124,7 +124,7 @@ youtube-veille/
 - [ ] Tags/catégories pour les vidéos
 - [ ] Export markdown pour veille.md
 - [ ] Notifications de nouvelles vidéos
-- [ ] Support Whisper pour vidéos sans sous-titres
+- [x] ~~Support Whisper pour vidéos sans sous-titres~~ Remplacé par Gemini 2.0 Flash
 
 ## License
 
