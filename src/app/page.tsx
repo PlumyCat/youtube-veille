@@ -159,33 +159,40 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <header className="bg-gray-800 shadow-sm sticky top-0 z-10 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-gray-100">📺 YouTube Veille</h1>
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      <header className="glass-header sticky top-0 z-40 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-primary">
+                <span className="text-2xl">📺</span>
+                <h1 className="text-xl font-black tracking-tighter text-foreground">
+                  YOUTUBE <span className="text-primary italic">VEILLE</span>
+                </h1>
+              </div>
               <Link
                 href="/channels"
-                className="text-sm text-blue-400 hover:text-blue-300"
+                className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
               >
                 Gérer les chaînes →
               </Link>
             </div>
 
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher..."
-                className="px-3 py-1.5 border border-gray-600 rounded text-sm bg-gray-700 text-gray-100 placeholder-gray-400 w-48"
-              />
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 md:flex-none">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Rechercher..."
+                  className="w-full md:w-64 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-muted-foreground/50"
+                />
+              </div>
 
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="px-3 py-1.5 border border-gray-600 rounded text-sm bg-gray-700 text-gray-100"
+                className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer hover:bg-white/10 transition-colors"
               >
                 <option value="new">À transcrire</option>
                 <option value="all">Toutes</option>
@@ -196,9 +203,25 @@ export default function Home() {
               <button
                 onClick={handleRefreshAll}
                 disabled={refreshing}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 text-sm"
+                className="flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20 active:scale-95 text-sm"
               >
-                {refreshing ? 'Chargement...' : '🔄 Actualiser'}
+                {refreshing ? (
+                  <span className="animate-spin text-lg">⏳</span>
+                ) : (
+                  <span className="text-lg">🔄</span>
+                )}
+                {refreshing ? 'Chargement...' : 'Actualiser'}
+              </button>
+
+              <button
+                onClick={async () => {
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/login';
+                }}
+                className="px-3 py-2 text-muted-foreground hover:text-foreground text-sm transition-colors cursor-pointer"
+                title="Se déconnecter"
+              >
+                Logout
               </button>
             </div>
           </div>
@@ -206,71 +229,85 @@ export default function Home() {
       </header>
 
       {toast && (
-        <div className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm transition-all ${
+        <div className={`fixed top-24 right-6 z-50 px-5 py-3 rounded-2xl shadow-2xl glass-card transition-all animate-in slide-in-from-right-4 duration-500 ${
           toast.type === 'error'
-            ? 'bg-red-900 text-red-200 border border-red-700'
-            : 'bg-green-900 text-green-200 border border-green-700'
+            ? 'border-red-500/50 text-red-100'
+            : 'border-green-500/50 text-green-100'
         }`}>
-          <div className="flex items-center gap-2">
-            <span>{toast.type === 'error' ? '⚠️' : '✓'} {toast.message}</span>
-            <button onClick={() => setToast(null)} className="ml-2 opacity-60 hover:opacity-100">✕</button>
+          <div className="flex items-center gap-3 font-medium">
+            <span className="text-lg">{toast.type === 'error' ? '⚠️' : '✨'}</span>
+            <span>{toast.message}</span>
+            <button onClick={() => setToast(null)} className="ml-4 opacity-40 hover:opacity-100 transition-opacity">✕</button>
           </div>
         </div>
       )}
 
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-800/95 backdrop-blur border-t border-blue-700 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <span className="text-blue-200 text-sm">
-              {selectedIds.size} vidéo(s) sélectionnée(s)
-            </span>
-            <div className="flex items-center gap-2">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl">
+          <div className="glass-card bg-primary/10 border-primary/30 rounded-2xl px-6 py-4 flex items-center justify-between shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-8 duration-500">
+            <div className="flex flex-col">
+              <span className="text-primary font-black text-[10px] uppercase tracking-widest">
+                SÉLECTION
+              </span>
+              <span className="text-foreground font-bold text-xs opacity-80">
+                {selectedIds.size} vidéo(s) marquée(s)
+              </span>
+            </div>
+            <div className="flex items-center gap-5">
               <button
                 onClick={clearSelection}
-                className="px-3 py-1.5 text-sm text-blue-400 hover:text-blue-300"
+                className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleTranscribeSelected}
                 disabled={transcribing}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 text-sm"
+                className="px-6 py-2.5 bg-foreground text-background font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50 text-xs uppercase tracking-widest"
               >
-                {transcribing ? 'Transcription...' : '📝 Transcrire la sélection'}
+                {transcribing ? 'Transcription...' : 'Transcrire la sélection'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Chargement...</div>
+          <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-4">
+            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="font-bold tracking-widest uppercase text-xs animate-pulse">Chargement...</p>
+          </div>
         ) : videos.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-400 mb-4">Aucune vidéo</p>
+          <div className="text-center py-24 glass-card rounded-3xl p-12 max-w-lg mx-auto">
+            <p className="text-muted-foreground mb-8 font-medium italic">Aucune vidéo trouvée pour ce filtre.</p>
             <Link
               href="/channels"
-              className="text-blue-400 hover:text-blue-300"
+              className="inline-block px-8 py-3 bg-primary text-primary-foreground font-bold rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-primary/20"
             >
-              Ajouter des chaînes pour commencer
+              Ajouter des chaînes →
             </Link>
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-400">
-                {videos.length} vidéo(s)
-              </p>
+            <div className="flex items-center justify-between mb-10 px-2">
+              <div className="flex flex-col">
+                <h2 className="text-[10px] font-black uppercase tracking-widest text-primary/60 mb-1">
+                  Tableau de bord
+                </h2>
+                <p className="text-2xl font-bold tracking-tight">
+                  {videos.length} <span className="text-muted-foreground font-medium text-lg italic">vidéos détectées</span>
+                </p>
+              </div>
               <button
                 onClick={selectAll}
-                className="text-sm text-blue-400 hover:text-blue-300"
+                className="text-[10px] font-black uppercase tracking-widest text-foreground hover:text-primary transition-all py-2 px-4 rounded-xl border border-white/10 hover:border-primary/50"
               >
                 Tout sélectionner
               </button>
             </div>
 
-            <div>
+            <div className="space-y-4">
               {groupedVideos.map(([channelName, channelVideos]) => (
                 <ChannelGroup
                   key={channelName}
