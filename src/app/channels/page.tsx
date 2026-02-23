@@ -81,29 +81,46 @@ export default function ChannelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-blue-400 hover:text-blue-300">
-              ← Retour
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      <header className="glass-header sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-6">
+            <Link href="/" className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all">
+              <div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-primary/10 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest">Retour</span>
             </Link>
-            <h1 className="text-xl font-bold text-gray-100">Gérer les chaînes</h1>
+            <h1 className="text-xl font-black tracking-tighter">GÉRER LES <span className="text-primary">CHAÎNES</span></h1>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+      <main className="max-w-4xl mx-auto px-6 py-10 space-y-10">
+        <section className="glass-card rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="mb-6">
+            <h2 className="text-xs font-black uppercase tracking-widest text-primary italic mb-1">Source</h2>
+            <p className="text-xl font-bold">Ajouter une chaîne</p>
+          </div>
           <AddChannelForm onAdd={handleAddChannel} />
-        </div>
+        </section>
 
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-100">
-            Chaînes suivies ({channels.length})
-          </h2>
+        <section className="glass-card rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h2 className="text-xs font-black uppercase tracking-widest text-primary italic mb-1">Index</h2>
+              <p className="text-xl font-bold">Chaînes suivies</p>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
+              {channels.length} Total
+            </span>
+          </div>
+
           {loading ? (
-            <div className="text-center py-8 text-gray-400">Chargement...</div>
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-4">
+              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <p className="font-bold tracking-widest uppercase text-[10px] animate-pulse">Chargement...</p>
+            </div>
           ) : (
             <ChannelList
               channels={channels}
@@ -111,7 +128,7 @@ export default function ChannelsPage() {
               onRefresh={handleRefreshChannel}
             />
           )}
-        </div>
+        </section>
       </main>
     </div>
   );

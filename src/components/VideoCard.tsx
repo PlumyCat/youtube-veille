@@ -65,10 +65,10 @@ export default function VideoCard({
   onSelect,
 }: VideoCardProps) {
   return (
-    <div className={`bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden hover:shadow-md transition-shadow ${selected ? 'ring-2 ring-blue-500' : ''}`}>
-      <div className="relative">
+    <div className={`glass-card group rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-white/20 ${selected ? 'ring-2 ring-primary border-transparent' : ''}`}>
+      <div className="relative overflow-hidden">
         <Link href={`/video/${id}`}>
-          <div className="relative aspect-video bg-gray-700">
+          <div className="relative aspect-video bg-muted/50 transition-transform duration-500 group-hover:scale-105">
             {thumbnail ? (
               <Image
                 src={thumbnail}
@@ -78,47 +78,50 @@ export default function VideoCard({
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                Pas de miniature
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                Sans miniature
               </div>
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             {duration && (
-              <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
+              <span className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md">
                 {formatDuration(duration)}
               </span>
             )}
           </div>
         </Link>
         {onSelect && (
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={(e) => onSelect(id, e.target.checked)}
-            className="absolute top-2 left-2 w-5 h-5 rounded cursor-pointer"
-          />
+          <div className="absolute top-2 left-2 z-10 transition-opacity duration-300 opacity-100 sm:opacity-0 group-hover:opacity-100">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={(e) => onSelect(id, e.target.checked)}
+              className="w-5 h-5 rounded-md border-white/20 bg-black/40 cursor-pointer accent-primary"
+            />
+          </div>
         )}
       </div>
 
-      <div className="p-3">
+      <div className="p-4">
         <Link href={`/video/${id}`}>
-          <h3 className="font-medium text-sm line-clamp-2 hover:text-blue-400 mb-1 text-gray-100">
+          <h3 className="font-semibold text-sm line-clamp-2 transition-colors group-hover:text-primary mb-2 text-foreground leading-tight">
             {title}
           </h3>
         </Link>
 
-        <div className="flex items-center justify-between text-xs text-gray-400">
-          <span className="truncate">{channelName}</span>
+        <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground">
+          <span className="truncate max-w-[60%]">{channelName}</span>
           {publishedAt && <span>{formatDate(new Date(publishedAt))}</span>}
         </div>
 
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mt-3">
           {status && (
-            <span className={`text-xs px-2 py-0.5 rounded ${statusColors[status] || 'bg-gray-700'}`}>
+            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${statusColors[status] || 'bg-muted text-muted-foreground'}`}>
               {statusLabels[status] || status}
             </span>
           )}
           {hasTranscript && (
-            <span className="text-xs px-2 py-0.5 rounded bg-purple-900 text-purple-200 border border-purple-700">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/30 text-[10px]" title="Transcrite">
               📝
             </span>
           )}

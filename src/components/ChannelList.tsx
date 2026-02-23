@@ -34,10 +34,10 @@ export default function ChannelList({ channels, onDelete, onRefresh }: ChannelLi
   }
 
   return (
-    <div className="divide-y divide-gray-700">
+    <div className="space-y-4">
       {channels.map((channel) => (
-        <div key={channel.id} className="flex items-center gap-4 py-4">
-          <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+        <div key={channel.id} className="group flex items-center gap-5 p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-muted border border-white/10 group-hover:border-primary/50 transition-colors shadow-lg">
             {channel.thumbnail ? (
               <Image
                 src={channel.thumbnail}
@@ -46,33 +46,37 @@ export default function ChannelList({ channels, onDelete, onRefresh }: ChannelLi
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xl">
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-2xl">
                 📺
               </div>
             )}
           </div>
 
           <div className="flex-grow min-w-0">
-            <h3 className="font-medium truncate text-gray-100">{channel.name}</h3>
-            <p className="text-sm text-gray-400 truncate">
+            <h3 className="font-black text-base truncate text-foreground tracking-tight group-hover:text-primary transition-colors">{channel.name}</h3>
+            <div className="flex items-center gap-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 truncate">
+                ID: {channel.id}
+              </p>
+              <span className="w-1 h-1 rounded-full bg-muted-foreground/20" />
               <a
                 href={`https://youtube.com/channel/${channel.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-blue-400"
+                className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
               >
-                Voir sur YouTube ↗
+                YouTube ↗
               </a>
-            </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => handleRefresh(channel.id)}
               disabled={loadingId === channel.id}
-              className="px-3 py-1.5 text-sm bg-blue-900/50 text-blue-300 rounded hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 border border-primary/20 transition-all active:scale-95"
             >
-              {loadingId === channel.id ? '...' : '🔄 Refresh'}
+              {loadingId === channel.id ? '...' : 'Refresh'}
             </button>
             <button
               onClick={() => {
@@ -80,9 +84,10 @@ export default function ChannelList({ channels, onDelete, onRefresh }: ChannelLi
                   onDelete(channel.id);
                 }
               }}
-              className="px-3 py-1.5 text-sm bg-red-900/50 text-red-300 rounded hover:bg-red-800"
+              className="p-2.5 text-sm bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 border border-red-500/20 hover:text-white transition-all active:scale-95"
+              title="Supprimer"
             >
-              🗑️
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
             </button>
           </div>
         </div>

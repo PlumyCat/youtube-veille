@@ -29,38 +29,42 @@ export default function AddChannelForm({ onAdd }: AddChannelFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div>
-        <label htmlFor="channel-input" className="block text-sm font-medium text-gray-300 mb-1">
-          Ajouter une chaîne
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="flex flex-col gap-4">
+        <label htmlFor="channel-input" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary italic">
+          Entrée Source
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             id="channel-input"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="URL YouTube, @handle, ou ID de chaîne"
-            className="flex-grow px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-gray-100 placeholder-gray-400"
+            placeholder="URL YouTube, @handle, ou ID..."
+            className="flex-grow px-5 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-muted-foreground/30"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3.5 bg-primary text-primary-foreground font-black rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all shadow-xl shadow-primary/20 active:scale-95 text-xs uppercase tracking-widest whitespace-nowrap"
           >
-            {loading ? '...' : '+ Ajouter'}
+            {loading ? 'CHARGEMENT...' : 'AJOUTER'}
           </button>
         </div>
       </div>
 
       {error && (
-        <p className="text-sm text-red-400">{error}</p>
+        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold uppercase tracking-widest animate-in slide-in-from-left-2 duration-300">
+          ⚠️ {error}
+        </div>
       )}
 
-      <p className="text-xs text-gray-400">
-        Exemples: https://youtube.com/@Fireship, @ThePrimeagen, UCsBjURrPoezykLs9EqgamOA
-      </p>
+      <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+        <p className="text-[10px] font-medium text-muted-foreground/60 leading-relaxed">
+          <span className="text-primary/60 font-black">EXEMPLES :</span> @Fireship, @ThePrimeagen, youtube.com/@JoueurDuGrenier
+        </p>
+      </div>
     </form>
   );
 }
